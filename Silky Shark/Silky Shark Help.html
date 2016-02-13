@@ -1,0 +1,271 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Silky Shark Help</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+
+        ul {
+            list-style-type: none;
+            font-family: Arial;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
+            width: 120px;
+            left: 0;
+            background-color: #f1f1f1;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+        }
+
+        li a {
+            display: block;
+            color: #000;
+            padding: 3px 5px 3px 5px;
+            text-align: left;
+            text-decoration: none;
+        }
+
+        li a.active {
+            background-color: #679cbf;
+            color: #fff;
+            text-align: center;
+            cursor: default;
+        }
+
+        .item a:hover {
+            background-color: #555;
+            color: #fff;
+        }
+
+        #top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        #content {
+            position: absolute;
+            left: 120px;
+            padding: 5px 5px;
+            height: 100%;
+            width: auto;
+            font-family: 'Times New Roman';
+        }
+
+        #signed {
+            text-align: right;
+            margin-right: 50px;
+        }
+    </style>
+    <script type="text/javascript">
+        function show(shown) {
+            hideAll();
+            document.getElementById(shown).style.display = 'block';
+            window.scrollTo(0, 0);
+            return false;
+        }
+        function hideAll() {
+            document.getElementById('information').style.display = 'none';
+            document.getElementById('mainwindow').style.display = 'none';
+            document.getElementById('settings').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('cursor').style.display = 'none';
+            document.getElementById('tablet').style.display = 'none';
+            document.getElementById('hotkeys').style.display = 'none';
+            document.getElementById('troubleshooting').style.display = 'none';
+            return false;
+        }
+    </script>
+</head>
+<body>
+    <ul>
+        <li><a class="active" href="#home"><strong>Silky Shark</strong></a></li>
+        <li class="item"><a href="#" onclick="return show('information');">Information</a></li>
+        <li class="item"><a href="#" onclick="return show('mainwindow');">Main Window</a></li>
+        <li class="item"><a href="#" onclick="return show('settings');">Settings</a></li>
+        <li class="item"><a href="#" onclick="return show('overlay');">&nbsp;&nbsp;&bull; Overlay</a></li>
+        <li class="item"><a href="#" onclick="return show('cursor');">&nbsp;&nbsp;&bull; Cursor</a></li>
+        <li class="item"><a href="#" onclick="return show('tablet');">&nbsp;&nbsp;&bull; Tablet</a></li>
+        <li class="item"><a href="#" onclick="return show('hotkeys');">&nbsp;&nbsp;&bull; Hotkeys</a></li>
+        <li class="item"><a href="#" onclick="return show('troubleshooting');">Troubleshooting</a></li>
+    </ul>
+    <div id="top"></div>
+    <div id="content">
+        <div id="information">
+            <h3>Information</h3>
+            <p>This help document offers insight and better explanations for Silky Shark's settings and features.</p>
+            <h4>Note from the author</h4>
+            <p>Silky Shark was created as another solution to enable mouse smoothing or stabilization for applications and web canvases that do not natively support smoothing or stabilization.</p>
+            <p>Being mostly a personal project at the time, this software operates on the notion of "<i>it works fine for me</i>". It will probably help if you have .NET updated, Windows 10, a Wacom or similar tablet that has the option to disable Windows/Micrsoft Ink, and have a relatively decent rig. There is no guarantee this will work for everyone given the nature of performance, hardware, and software discrepancies across systems. For a poor guesstimation on hardware and system compatibility, fixes and suggestions to what may be common issues, refer to the <i>Troubleshooting</i> section.</p>
+            <p>Unfortunately I offer little to no technical support for this software aside from what you will find in this help document. If you need a more personalized solution you are welcome to modify the source code. Silky Shark is free to use and open source software.</p>
+            <p id="signed">stoic</p>
+        </div>
+        <div id="mainwindow" style="display:none">
+            <h3>Main Window</h3>
+            <p>The Main Window is the first window visible when the application starts. If <em>Silky Shark.config</em> exists in the same directory, Silky Shark will attempt to load settings from it. If not, the program will load with default settings.</p>
+            <p>
+                <a href="#mwfilemenu">File Menu</a><br />
+                <a href="#mwsmoothingonoff">Smoothing On/Off</a><br />
+                <a href="#mwcycledisplay">Cycle Display</a><br />
+                <a href="#mweyedropper">Eyedropper</a><br />
+                <a href="#mwstrength">Strength</a><br />
+                <a href="#mwinterpolation">Interpolation</a><br />
+                <a href="#mwmanualinterpolation">Manual Interpolation</a><br />
+                <a href="#mwstayontop">Stay On Top</a><br />
+                <a href="#mwsmoothondraw">Smooth On Draw</a><br />
+                <a href="#mwtabletmode">Tablet Mode</a><br />
+            </p>
+            <h4 id="mwfilemenu">File Menu</h4>
+            <p>
+                &bull; File<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Save Config - Saves all settings to the <em>Silky Shark.config</em> file in the same directory. This file will be created if it does not exist. This option is disabled while the Settings window is open.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Restore Defaults - Restores all settings to their defaults. This option is disabled while the Settings window is open.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Exit - Exits the application.<br />
+                &bull; Settings - Opens the Settings window.<br />
+                &bull; Help - Opens the Help window.<br />
+                &bull;About - Opens the About window.
+            </p>
+            <h4 id="mwsmoothingonoff">Smoothing On Off</h4>
+            <p>Turns the smoothing feature on or off.</p>
+            <h4 id="mwcycledisplay">Cycle Display</h4>
+            <p>Cycles through the available screens and displays the overlay on them. Useful for when the main drawing screen isn't the primary screen.</p>
+            <h4 id="mweyedropper">Eyedropper</h4>
+            <p>Changes the virtual cursor's main color. To change the fill color refer to the cursor tab in the Settings window.</p>
+            <h4 id="mwstrength">Strength</h4>
+            <p>Decreases or increases the smoothing strength. This works by changing the time between sampling the virtual cursor's position. Increasing this setting will smooth movement more at the expense of accuracy.</p>
+            <h4 id="mwinterpolation">Interpolation</h4>
+            <p>Decreases or increases the number of points between strength sampling. This works by calculating a smooth curve between strength sample points and inserting (interpolating) between them. Increasing this setting will offer cleaner lines at the expense of processing power.</p>
+            <h4 id="mwmanualinterpolation">Manual Interpolation</h4>
+            <p>By default the interpolation setting will be automatically calculated as strength decreases or increases. Checking this box overrides this behaviour and allows the manual setting of the interpolation slider and text input. Useful if you need to decrease interpolation for better performance.</p>
+            <h4 id="mwstayontop">Stay On Top</h4>
+            <p>Toggles if the Main Window should stay on top of every window.</p>
+            <h4 id="mwsmoothondraw">Smooth On Draw</h4>
+            <p>Attempts to smooth only when the mouse or pen tablet is down.</p>
+            <h4 id="mwtabletmode">Tablet Mode</h4>
+            <p>Indicates if mouse or tablet pen movement is detected and changes the way Silky Shark handles that input. If you're having issues with tablet pen detection, tablet mode can be manually set if Disable Auto Detection is enabled in the tablet tab in the Settings window. Manually toggling tablet mode can only be done when smoothing is off unless done with it's hotkey.</p>
+        </div>
+        <div id="settings" style="display:none">
+            <h3>Settings</h3>
+            <p>The Settings window has advanced settings for handling the overlay, cursor, and tablet. Several global hotkeys can also be set here. While the Settings window is open Save Config, Restore Defaults, and triggering hotkeys are disabled.</p>
+        </div>
+        <div id="overlay" style="display:none">
+            <h3>Overlay</h3>
+            <p>Advanced overlay settings.</p>
+            <p>
+                <a href="#odisableoverlay">Disable Overlay</a><br />
+                <a href="#oallscreens">All Screens (Experimental)</a><br />
+                <a href="#omanualoverlayoverride">Manual Overlay Override</a><br />
+                <a href="#ooverlaysize">Overlay Size</a><br />
+                <a href="#ooverlayposition">Overlay Position</a><br />
+            </p>
+            <h4 id="odisableoverlay">Disable Overlay</h4>
+            <p>Disables or enables the virtual cursor's overlay. Disabling the overlay will increase performance.</p>
+            <h4 id="oallscreens">All Screens (Experimental)</h4>
+            <p>Attempts to extend the virtual cursor's overlay to all screens if applicable. This is very performance heavy.</p>
+            <h4 id="omanualoverlayoverride">Manual Overlay Override</h4>
+            <p>Enables the overlay override text inputs and overrides the location and size of the overlay. Overriding the overlay to occupy a smaller size will increase performance.</p>
+            <h4 id="ooverlaysize">Overlay Size</h4>
+            <p>Sets the overlay's width in terms of x pixels and height in terms of y pixels.</p>
+            <h4 id="ooverlayposition">Overlay Position</h4>
+            <p>Sets the overlay's position in terms of x and y in pixels.</p>
+        </div>
+        <div id="cursor" style="display:none">
+            <h3>Cursor</h3>
+            <p>Advanced cursor settings.</p>
+            <p>
+                <a href="#cdisablecatchup">Disable Catch Up</a><br />
+                <a href="#csnaptocursor">Snap To Cursor (Smooth On Draw)</a><br />
+                <a href="#ccursorgraphic">Cursor Graphic</a><br />
+                <a href="#cmaincolor">Main Color</a><br />
+                <a href="#cfillcolor">Fill Color</a><br />
+            </p>
+            <h4 id="cdisablecatchup">Disable Catch Up</h4>
+            <p>Disables the real cursor from catching up to the virtual cursor. Useful if you're having difficulties with lost mouse input when it's not moving.</p>
+            <h4 id="csnaptocursor">Snap To Cursor (Smooth On Draw)</h4>
+            <p>By default when Smooth To Draw is enabled the cursor will attempt to snap to the virutal cursor's position when done drawing. This will disable that behavior and snap the virtual cursor to the real cursor instead. This feature will most likely not work for tablet pens.</p>
+            <h4 id="ccursorgraphic">Cursor Graphic</h4>
+            <p>Choose from six different graphics to represent the virtual cursor.</p>
+            <h4 id="cmaincolor">Main Color</h4>
+            <p>Mimics the eyedropper functionality and changes the virtual cursor's main color.</p>
+            <h4 id="cfillcolor">Fill Color</h4>
+            <p>Changes the virtual cursor's filling color when applicable.</p>
+        </div>
+        <div id="tablet" style="display:none">
+            <h3>Tablet</h3>
+            <p>Advanced tablet settings.</p>
+            <p>
+                <a href="#tdisableautodetection">Disable Auto Detection</a><br />
+                <a href="#ttolerance">Tolerance</a><br />
+                <a href="#ttabletoffsetoverride">Tablet Offset Override</a><br />
+            </p>
+            <h4 id="tdisableautodetection">Disable Auto Detection</h4>
+            <p>This disables automatic tablet detection and enables the option to manually toggle tablet mode in the Main Window. Tabet mode can only be set when smoothing is not on unless done through tablet mode's hotkey. By default Silky Shark will attempt to do automatically detect when a tablet pen is in use by checking raw coordinate input. When a mouse moves it returns a pixel difference representing the next cursor postion whereas a tablet pen will return an absolute position. The absolute position is almost always a large number between 0 and 65536.</p>
+            <h4 id="ttolerance">Tolerance</h4>
+            <p>Tolerance polls a coordinate to test from the upper left corner of the screen space. Too large of a tolerance will deny tablet usage of the top left corner of the screen space. Too low of a tolerance may lead to fast mouse movements as being misinterpreted as tablet pen movement.</p>
+            <h4 id="ttabletoffsetoverride">Tablet Offset Override</h4>
+            <p>Overrides the virtual cursor and real cursor's position in terms of x and y in pixels when enabled.</p>
+        </div>
+        <div id="hotkeys" style="display:none">
+            <h3>Hotkeys</h3>
+            <p>Silky Shark can set global hotkeys. Note that these may override other application defined hotkeys if they share the same hotkey. Hotkeys are disabled while the  Settings window is open.</p>
+            <p>Hotkeys can be set for the following functions:</p>
+            <p>
+                &bull; Smooth On/Off<br />
+                &bull; Overlay On/Off<br />
+                &bull; Toggle Display<br />
+                &bull; Tablet Mode
+            </p>
+        </div>
+        <div id="troubleshooting" style="display:none">
+            <h3>Troubleshooting</h3>
+            <p>There are bound to be issues. Hopefully this might cover some of them.</p>
+            <h4>Minimum System and Hardware Requirements</h4>
+            <p>
+                Windows 8.1, Windows 10<br />
+                1 GB Ram<br />
+                2.0 GHz Processor<br />
+                .NET Framework 4.5.2 (or better)<br />
+            </p>
+            <p>
+                <a href="#t1">Tablet cursor jumps between itself and virtual cursor</a><br />
+                <a href="#t2">How to get this to work on Photoshop</a><br />
+                <a href="#t3">Mouse doesn't finish drawing while left click is down</a><br />
+                <a href="#t4">Tablet pen is drawing elsewhere</a><br />
+                <a href="#t5">How to improve performance</a><br />
+                <a href="#t6">How to load a configuration file</a><br />
+                <a href="#t7">Configuration file won't load</a><br />
+            </p>
+            <h4 id="t1">Tablet cursor jumps between itself and virtual cursor</h4>
+            <p>You will need to disable Windows/Microsoft Ink in your tablet driver's settings. Most if not all Wacom tablets should have this option as a checkbox when setting up program profiles.</p>
+            <h4 id="t2">How to get this to work on Photoshop</h4>
+            <p>
+                1. Disable Windows/Microsoft Ink for Photoshop in your tablet driver/profiler<br />
+                2. Navigate to your Photoshop settings folder. It should be located at:<br />
+                <em>C:\Users\YOURUSERNAME\AppData\Roaming\ Adobe\Adobe Photoshop CC\Adobe Photoshop CC Settings\</em><br />
+                3. Locate the settings file: <em>PSUserConfig.txt</em><br />
+                4. If it does not exist, create it.<br />
+                5. Add the following line inside that file:<br />
+                <em>UseSystemStylus 0</em><br /><br />
+                This will enable Photoshop's legacy handling for tablets.
+            </p>
+            <h4 id="t3">Mouse doesn't finish drawing while left click is down</h4>
+            <p>Under <em>Settings -> Cursor</em> check Disable Catch Up.</p>
+            <h4 id="t4">Tablet pen is drawing elsewhere</h4>
+            <p>Under <em>Settings -> Tablet</em> check Tablet Offset Override. You can offset the virtual cursor and real cursor with x and y in terms of pixels.</p>
+            <h4 id="t5">How to improve performance</h4>
+            <p>Disabling the overlay will boost performace by a lot. If you absolutely need the overlay, you can override the overlay with the Manual Overlay Override setting and tweak it to be positioned in an exact area at a smaller size. Enabling Smooth On Draw so smoothing will only occur when drawing may also help.</p>
+            <h4 id="t6">How to load a configuration file</h4>
+            <p>On startup, Silky Shark will load <em>Silky Shark.config</em> if it's found in the same directory.</p>
+            <h4 id="t7">Configuration file won't load</h4>
+            <p><em>Silky Shark.config</em> might be corrupted or my have a formatting error. Delete it and generate a new config file with Save Config.</p>
+        </div>
+    </div>
+</body>
+</html>
