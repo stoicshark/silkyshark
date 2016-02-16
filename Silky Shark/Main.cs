@@ -19,14 +19,15 @@ namespace Silky_Shark
         System.Timers.Timer lineProcessingTimer = new System.Timers.Timer();
         int virtualWidth = GetSystemMetrics(78);
         int virtualHeight = GetSystemMetrics(79);
-        //int virtualLeft = GetSystemMetrics(76);
-        //int virtualTop = GetSystemMetrics(77);
+        int virtualLeft = GetSystemMetrics(76);
+        int virtualTop = GetSystemMetrics(77);
         public bool smoothingOn = false;
         public bool isDrawing = false;
         public bool mouseMoving = false;
         public bool tabletMode = false;
         public Hotkey[] hotKeyHandling = new Hotkey[4];
-        Point lastOverlayPos = new Point(0, 0);
+        Point position = new Point(0, 0);
+        Point lastPosition = new Point(0, 0);
 
         // (Most) Settings
         public Point tabletOffset = new Point(0,0);
@@ -81,7 +82,7 @@ namespace Silky_Shark
             devices[0].UsagePage = 1;
             devices[0].Usage = 2;
             devices[0].Flags = 0x00000100;
-            devices[0].Target = this.Handle;
+            devices[0].Target = Handle;
             RegisterRawInputDevices(devices, 1, size);
         }
 
@@ -405,7 +406,7 @@ namespace Silky_Shark
                 button_smoothOnOff.PerformClick();
             }
         }
-
+        
         // Reading global raw input
         private void VirtualCursorUpdate(ref Message m)
         {
@@ -416,35 +417,44 @@ namespace Silky_Shark
             GetRawInputData(m.LParam, RidInput, out input, ref size, headerSize);
             RawMouse mouse = input.Mouse;
 
-            Point cPos = overlay.cursorPos;
-            
             if (!disableAutoDetection)
             {
-                if (mouse.LastX < -(tolerance) || mouse.LastX > tolerance)
+                if (mouse.LastX > tolerance || mouse.LastY > tolerance)
                 {
                     checkBox_tabletMode.Checked = true;
+                    tabletMode = true;
                 }
                 else
                 {
                     checkBox_tabletMode.Checked = false;
+                    tabletMode = false;
                 }
             }
 
-            if (checkBox_tabletMode.Checked)
+            if (isDrawing)
             {
-                Point offset = new Point(0, 0);
-                if (tabletOffsetOverride) offset = tabletOffset;
-                int tabletX = mouse.LastX * virtualWidth / 65536;
-                int tabletY = mouse.LastY * virtualHeight / 65536;
-                Point p = new Point(tabletX + offset.X, tabletY + offset.Y);
-                if (isDrawing) overlay.cursorPos = p;
-                overlay.Invalidate();
-            }
-            else
-            {
-                Point p = new Point(cPos.X + mouse.LastX, cPos.Y + mouse.LastY);
-                if (isDrawing) overlay.cursorPos = p;
-                overlay.Invalidate();
+                if (tabletMode)
+                {
+                    Point offset = new Point(0, 0);
+                    if (tabletOffsetOverride) offset = tabletOffset;
+                    int tabletX = mouse.LastX * virtualWidth / 65536;
+                    int tabletY = mouse.LastY * virtualHeight / 65536;
+                    Point p = new Point(tabletX + offset.X + virtualLeft, tabletY + offset.Y + virtualTop);
+                    position = p;
+                    overlay.cursorPos = p;
+                    overlay.Invalidate();
+                }
+                else
+                {
+                    Point p = new Point(position.X + mouse.LastX, position.Y + mouse.LastY);
+                    //if (p.X < virtualLeft) p.X = virtualLeft;
+                    //if (p.X > virtualWidth) p.X = virtualWidth;
+                    //if (p.Y < virtualTop) p.Y = virtualTop;
+                    //if (p.Y > virtualHeight) p.Y = virtualHeight;
+                    position = p;
+                    overlay.cursorPos = p;
+                    overlay.Invalidate();
+                }
             }
         }
 
@@ -489,18 +499,18 @@ namespace Silky_Shark
                     }
                     linePoints.RemoveAt(0);
                 }
-                else if (MouseHook.GetCursorPosition() != overlay.cursorPos && isDrawing)
+                else if (MouseHook.GetCursorPosition() != position && isDrawing)
                 {
                     if (disableCatchUp)
                     {
                         if (mouseMoving)
                         {
-                            linePoints.Add(overlay.cursorPos);
+                            linePoints.Add(position);
                         }
                     }
                     else
                     {
-                        linePoints.Add(overlay.cursorPos);
+                        linePoints.Add(position);
                     }
                 }
             }
@@ -523,7 +533,7 @@ namespace Silky_Shark
                 MouseHook.moveEnabled = true;
             }
 
-            if (lastOverlayPos == guidePos)
+            if (lastPosition == guidePos)
             {
                 mouseMoving = false;
             }
@@ -531,7 +541,7 @@ namespace Silky_Shark
             {
                 mouseMoving = true;
             }
-            lastOverlayPos = guidePos;
+            lastPosition = guidePos;
 
             try
             {
@@ -545,7 +555,7 @@ namespace Silky_Shark
                             MouseHook.SetCursorPos(smoothPoints[0].X, smoothPoints[0].Y);
                             smoothPoints.RemoveAt(0);
                         }
-                        lastOverlayPos = guidePos;
+                        lastPosition = guidePos;
                     }
                     else
                     {
@@ -574,7 +584,8 @@ namespace Silky_Shark
                     smoothPoints.Add(p);
                     linePoints.Add(p);
                     linePoints.Add(p);
-                    overlay.cursorPos = p;
+                    linePoints.Add(p);
+                    position = p;
                     isDrawing = true;
                     lineProcessingTimer.Start();
                     lineSmoothingTimer.Start();
@@ -617,41 +628,7 @@ namespace Silky_Shark
                 overlay.Invalidate();
             }
         }
-
-        // Raw input hook
-        private struct RawInputDevice
-        {
-            public short UsagePage;
-            public short Usage;
-            public int Flags;
-            public IntPtr Target;
-        }
-
-        private struct RawInputHeader
-        {
-            public int Type;
-            public int Size;
-            public IntPtr Device;
-            public IntPtr WParam;
-        }
-
-        private struct RawInput
-        {
-            public RawInputHeader Header;
-            public RawMouse Mouse;
-        }
-
-        private struct RawMouse
-        {
-            public short Flags;
-            public short ButtonFlags;
-            public short ButtonData;
-            public int RawButtons;
-            public int LastX;
-            public int LastY;
-            public int Extra;
-        }
-
+        
         protected override void WndProc(ref Message m)
         {
             const int WM_INPUT = 0xFF;
@@ -709,10 +686,8 @@ namespace Silky_Shark
                 button_smoothOnOff.BackColor = Color.Azure;
                 linePoints.Clear();
                 smoothPoints.Clear();
-                Point p = MouseHook.GetCursorPosition();
-                linePoints.Add(p);
-                linePoints.Add(p);
-                linePoints.Add(p);
+                position = MouseHook.GetCursorPosition();
+                smoothPoints.Add(position);
                 if (smoothOnDraw)
                 {
                     MouseHook.moveEnabled = true;
@@ -971,6 +946,40 @@ namespace Silky_Shark
                 about.Show();
             }
         }
+
+        // Raw input hook
+        private struct RawInputDevice
+        {
+            public short UsagePage;
+            public short Usage;
+            public int Flags;
+            public IntPtr Target;
+        }
+
+        private struct RawInputHeader
+        {
+            public int Type;
+            public int Size;
+            public IntPtr Device;
+            public IntPtr WParam;
+        }
+
+        private struct RawInput
+        {
+            public RawInputHeader Header;
+            public RawMouse Mouse;
+        }
+
+        private struct RawMouse
+        {
+            public short Flags;
+            public short ButtonFlags;
+            public short ButtonData;
+            public int RawButtons;
+            public int LastX;
+            public int LastY;
+            public int Extra;
+        }  
 
         //Dll importing
         [DllImport("user32.dll")]

@@ -30,13 +30,13 @@ namespace Silky_Shark
 
         public void OverlayPaint(object sender, PaintEventArgs e)
         {
-            Point windowOffset = Bounds.Location;
+            
             Graphics graphics = e.Graphics;
             Pen pen = new Pen(cursorColor);
             SolidBrush penBrush = new SolidBrush(cursorColor);
             SolidBrush fillBrush = new SolidBrush(cursorFillColor);
-            int x = -1 * windowOffset.X + cursorPos.X;
-            int y = -1 * windowOffset.Y + cursorPos.Y;
+            int x = cursorPos.X - Location.X;
+            int y = cursorPos.Y - Location.Y;
             Point offset;
 
             switch (cursorType)
