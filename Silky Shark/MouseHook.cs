@@ -15,6 +15,7 @@ namespace Silky_Shark
         private delegate IntPtr LowLevelMouseProcess(int nCode, IntPtr wParam, IntPtr lParam);
         private const int WH_MOUSE_LL = 14;
         public static bool moveEnabled = true;
+        public static bool downEnabled = true;
 
         public enum MouseMessages
         {
@@ -85,7 +86,14 @@ namespace Silky_Shark
                 {
                     MSLLHOOKSTRUCT hookStruct = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
                     MouseDownHooked(null, new EventArgs());
-                    return CallNextHookEx(_hookID, nCode, wParam, lParam);
+                    if (downEnabled)
+                    {
+                        return CallNextHookEx(_hookID, nCode, wParam, lParam);
+                    }
+                    else
+                    {
+                        return new IntPtr(1);
+                    }
                 }
 
                 // Mouse Up
