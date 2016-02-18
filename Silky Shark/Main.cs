@@ -523,16 +523,7 @@ namespace Silky_Shark
         // Line smoothing
         private void LineSmoothingUpdate(object sender, ElapsedEventArgs e)
         {
-            Point guidePos = overlay.cursorPos;
-
-            if (!isDrawing)
-            {
-                lineProcessingTimer.Stop();
-                lineSmoothingTimer.Stop();
-                if (!snapToCursor) MouseHook.SetCursorPos(guidePos.X, guidePos.Y);
-                MouseHook.moveEnabled = true;
-            }
-
+            Point guidePos = position;
             if (lastPosition == guidePos)
             {
                 mouseMoving = false;
@@ -555,7 +546,6 @@ namespace Silky_Shark
                             MouseHook.SetCursorPos(smoothPoints[0].X, smoothPoints[0].Y);
                             smoothPoints.RemoveAt(0);
                         }
-                        lastPosition = guidePos;
                     }
                     else
                     {
@@ -568,6 +558,15 @@ namespace Silky_Shark
             {
                 // Fail smoothing gracefully
             }
+
+            if (!isDrawing)
+            {
+                smoothPoints.Clear();
+                lineSmoothingTimer.Stop();
+                if (!snapToCursor) MouseHook.SetCursorPos(guidePos.X, guidePos.Y);
+                MouseHook.moveEnabled = true;
+                MouseHook.downEnabled = true;
+            }
         }
 
         // Mouse event handling
@@ -577,9 +576,9 @@ namespace Silky_Shark
             {
                 if (smoothOnDraw && !isDrawing)
                 {
-                    MouseHook.moveEnabled = false;
                     linePoints.Clear();
                     smoothPoints.Clear();
+                    MouseHook.moveEnabled = false;
                     Point p = MouseHook.GetCursorPosition();
                     smoothPoints.Add(p);
                     linePoints.Add(p);
@@ -599,9 +598,10 @@ namespace Silky_Shark
             {
                 if (smoothOnDraw && isDrawing)
                 {
+                    MouseHook.downEnabled = false;
                     isDrawing = false;
+                    lineProcessingTimer.Stop();
                     linePoints.Clear();
-                    smoothPoints.Clear();
                     if (!snapToCursor)
                     {
                         Point guidePos = overlay.cursorPos;
@@ -663,6 +663,7 @@ namespace Silky_Shark
                 // Off
                 button_smoothOnOff.BackColor = Color.Gainsboro;
                 MouseHook.moveEnabled = true;
+                MouseHook.downEnabled = true;
                 smoothingOn = false;
                 isDrawing = false;
                 lineSmoothingTimer.Stop();
@@ -848,6 +849,7 @@ namespace Silky_Shark
                 {
                     isDrawing = true;
                     MouseHook.moveEnabled = false;
+                    MouseHook.downEnabled = true;
                     lineProcessingTimer.Start();
                     lineSmoothingTimer.Start();
                 }
