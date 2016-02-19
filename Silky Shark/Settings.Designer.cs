@@ -266,11 +266,11 @@
             this.tabPage_cursor.Text = "Cursor";
             this.tabPage_cursor.UseVisualStyleBackColor = true;
             // 
-            // checkBox_snapToGuide
+            // checkBox_snapToCursor
             // 
             this.checkBox_snapToCursor.AutoSize = true;
             this.checkBox_snapToCursor.Location = new System.Drawing.Point(6, 29);
-            this.checkBox_snapToCursor.Name = "checkBox_snapToGuide";
+            this.checkBox_snapToCursor.Name = "checkBox_snapToCursor";
             this.checkBox_snapToCursor.Size = new System.Drawing.Size(190, 17);
             this.checkBox_snapToCursor.TabIndex = 17;
             this.checkBox_snapToCursor.Text = "Snap To Cursor (Smooth On Draw)";
