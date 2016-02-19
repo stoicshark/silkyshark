@@ -332,16 +332,9 @@
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_settings;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_help;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_exit;
-        private System.Windows.Forms.TrackBar trackBar_smoothingStrength;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.TextBox textBox_smoothingStrength;
-        private System.Windows.Forms.TextBox textBox_smoothingInterpolation;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TrackBar trackBar_smoothingInterpolation;
-        private System.Windows.Forms.CheckBox checkBox_stayOnTop;
-        private System.Windows.Forms.CheckBox checkBox_manualInterpolation;
-        private System.Windows.Forms.CheckBox checkBox_smoothOnDraw;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_about;
         private System.Windows.Forms.ToolTip toolTip_smoothingOnOff;
@@ -354,6 +347,13 @@
         public System.Windows.Forms.Button button_toggleDisplay;
         public System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_saveConfig;
         public System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_restoreDefaults;
+        public System.Windows.Forms.TrackBar trackBar_smoothingStrength;
+        public System.Windows.Forms.TextBox textBox_smoothingStrength;
+        public System.Windows.Forms.TextBox textBox_smoothingInterpolation;
+        public System.Windows.Forms.TrackBar trackBar_smoothingInterpolation;
+        public System.Windows.Forms.CheckBox checkBox_stayOnTop;
+        public System.Windows.Forms.CheckBox checkBox_manualInterpolation;
+        public System.Windows.Forms.CheckBox checkBox_smoothOnDraw;
     }
 }
 

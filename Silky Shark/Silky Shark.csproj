@@ -74,6 +74,7 @@
     <Compile Include="About.Designer.cs">
       <DependentUpon>About.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config.cs" />
     <Compile Include="Help.cs">
       <SubType>Form</SubType>
     </Compile>
