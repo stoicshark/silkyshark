@@ -478,125 +478,44 @@ namespace Silky_Shark
         // Hotkey tab handling
         private void textBox_hotkeySmoothOnOff_KeyDown(object sender, KeyEventArgs e)
         {
-            e.SuppressKeyPress = true;
-            if (e.Modifiers != Keys.None)
-            {
-                Keys key = Keys.None;
-                Hotkey.KeyModifiers modifiers = Hotkey.GetModifiers(e.KeyData, out key);
-                if (key != Keys.None)
-                {
-                    string mod = "";
-                    string[] mSplit = modifiers.ToString().Split(new[] { ", " }, StringSplitOptions.None);
-                    foreach (string m in mSplit)
-                    {
-                         mod += m + "+";
-                    }
-                    textBox_hotkeySmoothOnOff.Text = mod + key;
-                    string hotkey = e.KeyData.ToString();
-                    if (!mainForm.hotkeys.Any(hotkey.Contains))
-                    {
-                        mainForm.hotkeys[0] = hotkey;
-                        mainForm.RegisterHotkey(mainForm.Handle, 100, modifiers, key);
-                    }
-                }
-            }
+            SettingsRegisterHotkey(e, 0);
         }
 
         private void button_hotkeyOnOff_Click(object sender, EventArgs e)
         {
-            try
-            {
-                mainForm.hotKeyHandling[0].Dispose();
-                mainForm.hotkeys[0] = "None";
-                textBox_hotkeySmoothOnOff.Text = "";
-            }
-            catch
-            {
-                // No hotkey to dispose?
-            }
+            SettingsUnregisterHotkey(0);
         }
 
         private void textBox_hotkeyOverlayOnOff_KeyDown(object sender, KeyEventArgs e)
         {
-            e.SuppressKeyPress = true;
-            if (e.Modifiers != Keys.None)
-            {
-                Keys key = Keys.None;
-                Hotkey.KeyModifiers modifiers = Hotkey.GetModifiers(e.KeyData, out key);
-                if (key != Keys.None)
-                {
-                    string mod = "";
-                    string[] mSplit = modifiers.ToString().Split(new[] { ", " }, StringSplitOptions.None);
-                    foreach (string m in mSplit)
-                    {
-                        mod += m + "+";
-                    }
-                    textBox_hotkeyOverlayOnOff.Text = mod + key;
-                    string hotkey = e.KeyData.ToString();
-                    if (!mainForm.hotkeys.Any(hotkey.Contains))
-                    {
-                        mainForm.hotkeys[1] = hotkey;
-                        mainForm.RegisterHotkey(mainForm.Handle, 101, modifiers, key);
-                    }
-                }
-            }
+            SettingsRegisterHotkey(e, 1);
         }
 
         private void button_hotkeyOverlayOnOff_Click(object sender, EventArgs e)
         {
-            try
-            {
-                mainForm.hotKeyHandling[1].Dispose();
-                mainForm.hotkeys[1] = "None";
-                textBox_hotkeyOverlayOnOff.Text = "";
-            }
-            catch
-            {
-                // No hotkey to dispose?
-            }
+            SettingsUnregisterHotkey(1);
         }
 
         private void textBox_hotkeyToggleDisplay_KeyDown(object sender, KeyEventArgs e)
         {
-            e.SuppressKeyPress = true;
-            if (e.Modifiers != Keys.None)
-            {
-                Keys key = Keys.None;
-                Hotkey.KeyModifiers modifiers = Hotkey.GetModifiers(e.KeyData, out key);
-                if (key != Keys.None)
-                {
-                    string mod = "";
-                    string[] mSplit = modifiers.ToString().Split(new[] { ", " }, StringSplitOptions.None);
-                    foreach (string m in mSplit)
-                    {
-                        mod += m + "+";
-                    }
-                    textBox_hotkeyToggleDisplay.Text = mod + key;
-                    string hotkey = e.KeyData.ToString();
-                    if (!mainForm.hotkeys.Any(hotkey.Contains))
-                    {
-                        mainForm.hotkeys[2] = hotkey;
-                        mainForm.RegisterHotkey(mainForm.Handle, 102, modifiers, key);
-                    }
-                }
-            }
+            SettingsRegisterHotkey(e, 2);
         }
 
         private void button_hotkeyToggleDisplay_Click(object sender, EventArgs e)
         {
-            try
-            {
-                mainForm.hotKeyHandling[2].Dispose();
-                mainForm.hotkeys[2] = "None";
-                textBox_hotkeyToggleDisplay.Text = "";
-            }
-            catch
-            {
-                // No hotkey to dispose?
-            }
+            SettingsUnregisterHotkey(2);
         }
 
         private void textBox_hotkeyTabletMode_KeyDown(object sender, KeyEventArgs e)
+        {
+            SettingsRegisterHotkey(e, 3);
+        }
+        private void button_hotkeyTabletMode_Click(object sender, EventArgs e)
+        {
+            SettingsUnregisterHotkey(3);
+        }
+
+        private void SettingsRegisterHotkey(KeyEventArgs e, int id)
         {
             e.SuppressKeyPress = true;
             if (e.Modifiers != Keys.None)
@@ -611,24 +530,52 @@ namespace Silky_Shark
                     {
                         mod += m + "+";
                     }
-                    textBox_hotkeyTabletMode.Text = mod + key;
                     string hotkey = e.KeyData.ToString();
                     if (!mainForm.hotkeys.Any(hotkey.Contains))
                     {
-                        mainForm.hotkeys[3] = hotkey;
-                        mainForm.RegisterHotkey(mainForm.Handle, 103, modifiers, key);
+                        switch (id)
+                        {
+                            case 0:
+                                textBox_hotkeySmoothOnOff.Text = mod + key;
+                                break;
+                            case 1:
+                                textBox_hotkeyOverlayOnOff.Text = mod + key;
+                                break;
+                            case 2:
+                                textBox_hotkeyToggleDisplay.Text = mod + key;
+                                break;
+                            case 3:
+                                textBox_hotkeyTabletMode.Text = mod + key;
+                                break;
+                        }
+                        mainForm.hotkeys[id] = hotkey;
+                        mainForm.RegisterHotkey(mainForm.Handle, id, modifiers, key);
                     }
                 }
             }
         }
 
-        private void button_hotkeyTabletMode_Click(object sender, EventArgs e)
+        private  void SettingsUnregisterHotkey(int id)
         {
             try
             {
-                mainForm.hotKeyHandling[3].Dispose();
-                mainForm.hotkeys[3] = "None";
-                textBox_hotkeyTabletMode.Text = "";
+                mainForm.hotKeyHandling[id].Dispose();
+                mainForm.hotkeys[id] = "None";
+                switch (id)
+                {
+                    case 0:
+                        textBox_hotkeySmoothOnOff.Text = "";
+                        break;
+                    case 1:
+                        textBox_hotkeyOverlayOnOff.Text = "";
+                        break;
+                    case 2:
+                        textBox_hotkeyToggleDisplay.Text = "";
+                        break;
+                    case 3:
+                        textBox_hotkeyTabletMode.Text = "";
+                        break;
+                }
             }
             catch
             {
