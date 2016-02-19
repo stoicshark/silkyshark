@@ -134,37 +134,16 @@ namespace Silky_Shark
                 button_colorDialog.BackColor = overlay.cursorColor;
 
                 // Hotkey resetting
-                try
+                for (int i = 0; i < hotKeyHandling.Count(); i++)
                 {
-                    hotKeyHandling[0].Dispose();
-                }
-                catch
-                {
-                    // Nothing to dispose!
-                }
-                try
-                {
-                    hotKeyHandling[1].Dispose();
-                }
-                catch
-                {
-                    // Nothing to dispose!
-                }
-                try
-                {
-                    hotKeyHandling[2].Dispose();
-                }
-                catch
-                {
-                    // Nothing to dispose!
-                }
-                try
-                {
-                    hotKeyHandling[3].Dispose();
-                }
-                catch
-                {
-                    // Nothing to dispose!
+                    try
+                    {
+                        hotKeyHandling[i].Dispose();
+                    }
+                    catch
+                    {
+                        // Nothing to dispose!
+                    }
                 }
             }
             else
@@ -231,7 +210,7 @@ namespace Silky_Shark
                         m = Hotkey.GetModifiers(k, out k);
                         if (k != Keys.None)
                         {
-                            RegisterHotkey(Handle, 100, m, k);
+                            RegisterHotkey(Handle, 0, m, k);
                         }
                     }
                     hotkeys[1] = config.AppSettings.Settings["Hotkey 2"].Value;
@@ -241,7 +220,7 @@ namespace Silky_Shark
                         m = Hotkey.GetModifiers(k, out k);
                         if (k != Keys.None)
                         {
-                            RegisterHotkey(Handle, 101, m, k);
+                            RegisterHotkey(Handle, 1, m, k);
                         }
                     }
                     hotkeys[2] = config.AppSettings.Settings["Hotkey 3"].Value;
@@ -251,7 +230,7 @@ namespace Silky_Shark
                         m = Hotkey.GetModifiers(k, out k);
                         if (k != Keys.None)
                         {
-                            RegisterHotkey(Handle, 102, m, k);
+                            RegisterHotkey(Handle, 2, m, k);
                         }
                     }
                     hotkeys[3] = config.AppSettings.Settings["Hotkey 4"].Value;
@@ -261,7 +240,7 @@ namespace Silky_Shark
                         m = Hotkey.GetModifiers(k, out k);
                         if (k != Keys.None)
                         {
-                            RegisterHotkey(Handle, 103, m, k);
+                            RegisterHotkey(Handle, 3, m, k);
                         }
                     }
                 }
@@ -331,10 +310,9 @@ namespace Silky_Shark
         // Hotkey handling
         public void RegisterHotkey(IntPtr handle, int id, Hotkey.KeyModifiers modifiers, Keys key)
         {
-            int i = id - 100;
             try
             {
-                hotKeyHandling[i].Dispose();
+                hotKeyHandling[id].Dispose();
             }
             catch
             {
@@ -343,8 +321,8 @@ namespace Silky_Shark
 
             try
             { 
-                hotKeyHandling[i] = new Hotkey(Handle, id, modifiers, key);
-                switch (i)
+                hotKeyHandling[id] = new Hotkey(Handle, id, modifiers, key);
+                switch (id)
                 {
                     case 0:
                         hotKeyHandling[0].HotKeyPressed += new EventHandler(Hotkey_SmoothOnOff);
@@ -370,7 +348,11 @@ namespace Silky_Shark
         {
             if (Application.OpenForms.OfType<Settings>().Count() != 1)
             {
-                if (!smoothingOn && disableAutoDetection) checkBox_tabletMode.Checked = !checkBox_tabletMode.Checked;
+                if (disableAutoDetection)
+                {
+                    checkBox_tabletMode.Checked = !checkBox_tabletMode.Checked;
+                    tabletMode = checkBox_tabletMode.Checked;
+                }
             }
         }
 
@@ -870,6 +852,7 @@ namespace Silky_Shark
                 overlayScreen = 0;
             }
             overlay.Bounds = Screen.AllScreens[overlayScreen].Bounds;
+            overlay.Invalidate();
         }
 
         private void button_colorDialog_Click(object sender, EventArgs e)
