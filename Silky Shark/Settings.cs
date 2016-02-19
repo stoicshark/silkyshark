@@ -8,19 +8,21 @@ namespace Silky_Shark
     public partial class Settings : Form
     {
         Main mainForm;
+        Config config;
         Overlay overlayForm;
 
-        public Settings(Main mForm, Overlay oForm)
+        public Settings(Main mF, Config cG, Overlay oF)
         {
             InitializeComponent();
             panel_cursorPanel.Paint += new PaintEventHandler(CursorPreviewPaint);
-            mainForm = mForm;
-            overlayForm = oForm;
+            mainForm = mF;
+            config = cG;
+            overlayForm = oF;
 
             // Overlay tab setup
-            if (mainForm.disableOverlay) checkBox_disableOverlay.Checked = true;
-            if (mainForm.allScreens) checkBox_allScreens.Checked = true;
-            if (mainForm.manualOverlayOverride)
+            if (config.disableOverlay) checkBox_disableOverlay.Checked = true;
+            if (config.allScreens) checkBox_allScreens.Checked = true;
+            if (config.manualOverlayOverride)
             {
                 checkBox_manualOverlayOverride.Checked = true;
             }
@@ -31,15 +33,15 @@ namespace Silky_Shark
                 textBox_overlaySizeX.Enabled = false;
                 textBox_overlaySizeY.Enabled = false;
             }
-            Rectangle ob = mainForm.overrideBounds;
+            Rectangle ob = config.overrideBounds;
             textBox_overlayPositionX.Text = ob.Location.X.ToString();
             textBox_overlayPositionY.Text = ob.Location.Y.ToString();
             textBox_overlaySizeX.Text = ob.Width.ToString();
             textBox_overlaySizeY.Text = ob.Height.ToString();
 
             // Cursor tab
-            if (mainForm.disableCatchUp) checkBox_disableCatchUp.Checked = true;
-            if (mainForm.snapToCursor) checkBox_snapToCursor.Checked = true;
+            if (config.disableCatchUp) checkBox_disableCatchUp.Checked = true;
+            if (config.snapToCursor) checkBox_snapToCursor.Checked = true;
             switch (overlayForm.cursorType)
             {
                 case Overlay.CursorType.Bullseye:
@@ -65,14 +67,14 @@ namespace Silky_Shark
             button_fillColor.BackColor = overlayForm.cursorFillColor;
 
             // Tablet tab
-            if (mainForm.disableAutoDetection) checkBox_disableAutoDetection.Checked = true;
+            if (config.disableAutoDetection) checkBox_disableAutoDetection.Checked = true;
             if (mainForm.smoothingOn)
             {
                 checkBox_disableAutoDetection.Enabled = false;
             }
-            int t = mainForm.tolerance;
+            int t = config.tolerance;
             textBox_tolerance.Text = t.ToString();
-            if (mainForm.tabletOffsetOverride)
+            if (config.tabletOffsetOverride)
             {
                 checkBox_tabletOffsetOverride.Checked = true;
             }
@@ -81,7 +83,7 @@ namespace Silky_Shark
                 textBox_tabletOffsetX.Enabled = false;
                 textBox_tabletOffsetY.Enabled = false;
             }
-            Point co = mainForm.tabletOffset;
+            Point co = config.tabletOffset;
             textBox_tabletOffsetX.Text = co.X.ToString();
             textBox_tabletOffsetY.Text = co.Y.ToString();
 
@@ -91,7 +93,7 @@ namespace Silky_Shark
             string[] ms;
             Keys k;
             Hotkey.KeyModifiers m;
-            k = (Keys)c.ConvertFromString(mainForm.hotkeys[0]);
+            k = (Keys)c.ConvertFromString(config.hotkeys[0]);
             if (k.ToString() != "None")
             {
                 m = Hotkey.GetModifiers(k, out k);
@@ -103,7 +105,7 @@ namespace Silky_Shark
                 }
                 textBox_hotkeySmoothOnOff.Text = mod + k;
             }
-            k = (Keys)c.ConvertFromString(mainForm.hotkeys[1]);
+            k = (Keys)c.ConvertFromString(config.hotkeys[1]);
             if (k.ToString() != "None")
             {
                 m = Hotkey.GetModifiers(k, out k);
@@ -115,7 +117,7 @@ namespace Silky_Shark
                 }
                 textBox_hotkeyOverlayOnOff.Text = mod + k;
             }
-            k = (Keys)c.ConvertFromString(mainForm.hotkeys[2]);
+            k = (Keys)c.ConvertFromString(config.hotkeys[2]);
             if (k.ToString() != "None")
             {
                 m = Hotkey.GetModifiers(k, out k);
@@ -127,7 +129,7 @@ namespace Silky_Shark
                 }
                 textBox_hotkeyToggleDisplay.Text = mod + k;
             }
-            k = (Keys)c.ConvertFromString(mainForm.hotkeys[3]);
+            k = (Keys)c.ConvertFromString(config.hotkeys[3]);
             if (k.ToString() != "None")
             {
                 m = Hotkey.GetModifiers(k, out k);
@@ -218,12 +220,12 @@ namespace Silky_Shark
             if (checkBox_disableOverlay.Checked)
             {
                 overlayForm.Hide();
-                mainForm.disableOverlay = true;
+                config.disableOverlay = true;
             }
             else
             {
                 overlayForm.Show();
-                mainForm.disableOverlay = false;
+                config.disableOverlay = false;
             }
         }
 
@@ -232,12 +234,12 @@ namespace Silky_Shark
             if (checkBox_allScreens.Checked)
             {
                 overlayForm.Bounds = new Rectangle(0, 0, SystemInformation.VirtualScreen.Width, SystemInformation.VirtualScreen.Height);
-                mainForm.allScreens = true;
+                config.allScreens = true;
             }
             else
             {
-                overlayForm.Bounds = Screen.AllScreens[mainForm.overlayScreen].Bounds;
-                mainForm.allScreens = false;
+                overlayForm.Bounds = Screen.AllScreens[config.overlayScreen].Bounds;
+                config.allScreens = false;
             }
         }
 
@@ -245,41 +247,41 @@ namespace Silky_Shark
         {
             if (checkBox_manualOverlayOverride.Checked)
             {
-                overlayForm.Bounds = mainForm.overrideBounds;
+                overlayForm.Bounds = config.overrideBounds;
                 textBox_overlayPositionX.Enabled = true;
                 textBox_overlayPositionY.Enabled = true;
                 textBox_overlaySizeX.Enabled = true;
                 textBox_overlaySizeY.Enabled = true;
-                mainForm.manualOverlayOverride = true;
+                config.manualOverlayOverride = true;
             }
             else
             {
                 if (checkBox_allScreens.Checked)
                 {
                     overlayForm.Bounds = new Rectangle(0, 0, SystemInformation.VirtualScreen.Width, SystemInformation.VirtualScreen.Height);
-                    mainForm.allScreens = true;
+                    config.allScreens = true;
                 }
                 else
                 {
-                    overlayForm.Bounds = Screen.AllScreens[mainForm.overlayScreen].Bounds;
-                    mainForm.allScreens = false;
+                    overlayForm.Bounds = Screen.AllScreens[config.overlayScreen].Bounds;
+                    config.allScreens = false;
                 }
                 textBox_overlayPositionX.Enabled = false;
                 textBox_overlayPositionY.Enabled = false;
                 textBox_overlaySizeX.Enabled = false;
                 textBox_overlaySizeY.Enabled = false;
-                mainForm.manualOverlayOverride = false;
+                config.manualOverlayOverride = false;
             }
         }
 
         private void textBox_overlaySizeX_TextChanged(object sender, EventArgs e)
         {
-            if (mainForm.manualOverlayOverride)
+            if (config.manualOverlayOverride)
             {
-                Rectangle b = mainForm.overrideBounds;
+                Rectangle b = config.overrideBounds;
                 int i = int.TryParse(textBox_overlaySizeX.Text, out i) ? i : 0;
                 b.Width = i;
-                mainForm.overrideBounds = b;
+                config.overrideBounds = b;
                 overlayForm.Bounds = b;
                 textBox_overlaySizeX.Text = b.Width.ToString();
             }
@@ -287,12 +289,12 @@ namespace Silky_Shark
 
         private void textBox_overlaySizeY_TextChanged(object sender, EventArgs e)
         {
-            if (mainForm.manualOverlayOverride)
+            if (config.manualOverlayOverride)
             {
-                Rectangle b = mainForm.overrideBounds;
+                Rectangle b = config.overrideBounds;
                 int i = int.TryParse(textBox_overlaySizeY.Text, out i) ? i : 0;
                 b.Height = i;
-                mainForm.overrideBounds = b;
+                config.overrideBounds = b;
                 overlayForm.Bounds = b;
                 textBox_overlaySizeY.Text = b.Height.ToString();
             }
@@ -300,12 +302,12 @@ namespace Silky_Shark
 
         private void textBox_overlayPositionX_TextChanged(object sender, EventArgs e)
         {
-            if (mainForm.manualOverlayOverride)
+            if (config.manualOverlayOverride)
             {
-                Rectangle b = mainForm.overrideBounds;
+                Rectangle b = config.overrideBounds;
                 int i = int.TryParse(textBox_overlayPositionX.Text, out i) ? i : 0;
                 b.X = i;
-                mainForm.overrideBounds = b;
+                config.overrideBounds = b;
                 overlayForm.Bounds = b;
                 textBox_overlayPositionX.Text = b.X.ToString();
             }
@@ -313,12 +315,12 @@ namespace Silky_Shark
 
         private void textBox_overlayPositionY_TextChanged(object sender, EventArgs e)
         {
-            if (mainForm.manualOverlayOverride)
+            if (config.manualOverlayOverride)
             {
-                Rectangle b = mainForm.overrideBounds;
+                Rectangle b = config.overrideBounds;
                 int i = int.TryParse(textBox_overlayPositionY.Text, out i) ? i : 0;
                 b.Y = i;
-                mainForm.overrideBounds = b;
+                config.overrideBounds = b;
                 overlayForm.Bounds = b;
                 textBox_overlayPositionY.Text = b.Y.ToString();
             }
@@ -330,11 +332,11 @@ namespace Silky_Shark
         {
             if (checkBox_disableCatchUp.Checked)
             {
-                mainForm.disableCatchUp = true;
+                config.disableCatchUp = true;
             }
             else
             {
-                mainForm.disableCatchUp = false;
+                config.disableCatchUp = false;
             }
         }
 
@@ -342,11 +344,11 @@ namespace Silky_Shark
         {
             if (checkBox_snapToCursor.Checked)
             {
-                mainForm.snapToCursor = true;
+                config.snapToCursor = true;
             }
             else
             {
-                mainForm.snapToCursor = false;
+                config.snapToCursor = false;
             }
         }
 
@@ -419,12 +421,12 @@ namespace Silky_Shark
             if (checkBox_disableAutoDetection.Checked)
             {
                 mainForm.checkBox_tabletMode.Enabled = true;
-                mainForm.disableAutoDetection = true;
+                config.disableAutoDetection = true;
             }
             else
             {
                 mainForm.checkBox_tabletMode.Enabled = false;
-                mainForm.disableAutoDetection = false;
+                config.disableAutoDetection = false;
             }
         }
 
@@ -433,12 +435,12 @@ namespace Silky_Shark
             int i = int.TryParse(textBox_tolerance.Text, out i) ? i : 0;
             if (i > 0)
             {
-                mainForm.tolerance = i;
+                config.tolerance = i;
                 textBox_tolerance.Text = i.ToString();
             }
             else
             {
-                mainForm.tolerance = 0;
+                config.tolerance = 0;
                 textBox_tolerance.Text = "0";
             }
         }
@@ -449,29 +451,29 @@ namespace Silky_Shark
             {
                 textBox_tabletOffsetX.Enabled = true;
                 textBox_tabletOffsetY.Enabled = true;
-                mainForm.tabletOffsetOverride = true;
+                config.tabletOffsetOverride = true;
             }
             else
             {
                 textBox_tabletOffsetX.Enabled = false;
                 textBox_tabletOffsetY.Enabled = false;
-                mainForm.tabletOffsetOverride = false;
+                config.tabletOffsetOverride = false;
             }
         }
 
         private void textBox_tabletOffsetX_TextChanged(object sender, EventArgs e)
         {
-            Point p = mainForm.tabletOffset;
+            Point p = config.tabletOffset;
             int i = int.TryParse(textBox_tabletOffsetX.Text, out i) ? i : 0;
-            mainForm.tabletOffset = new Point(i, p.Y);
+            config.tabletOffset = new Point(i, p.Y);
             textBox_tabletOffsetX.Text = i.ToString();
         }
 
         private void textBox_tabletOffsetY_TextChanged(object sender, EventArgs e)
         {
-            Point p = mainForm.tabletOffset;
+            Point p = config.tabletOffset;
             int i = int.TryParse(textBox_tabletOffsetY.Text, out i) ? i : 0;
-            mainForm.tabletOffset = new Point(p.X, i);
+            config.tabletOffset = new Point(p.X, i);
             textBox_tabletOffsetY.Text = i.ToString();
         }
 
@@ -531,7 +533,7 @@ namespace Silky_Shark
                         mod += m + "+";
                     }
                     string hotkey = e.KeyData.ToString();
-                    if (!mainForm.hotkeys.Any(hotkey.Contains))
+                    if (!config.hotkeys.Any(hotkey.Contains))
                     {
                         switch (id)
                         {
@@ -548,7 +550,7 @@ namespace Silky_Shark
                                 textBox_hotkeyTabletMode.Text = mod + key;
                                 break;
                         }
-                        mainForm.hotkeys[id] = hotkey;
+                        config.hotkeys[id] = hotkey;
                         mainForm.RegisterHotkey(mainForm.Handle, id, modifiers, key);
                     }
                 }
@@ -560,7 +562,7 @@ namespace Silky_Shark
             try
             {
                 mainForm.hotKeyHandling[id].Dispose();
-                mainForm.hotkeys[id] = "None";
+                config.hotkeys[id] = "None";
                 switch (id)
                 {
                     case 0:

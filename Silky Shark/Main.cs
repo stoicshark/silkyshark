@@ -11,57 +11,41 @@ namespace Silky_Shark
 {
     public partial class Main : Form
     {
-        Settings settings;
-        Overlay overlay = new Overlay();
-        List<Point> linePoints = new List<Point>();
-        List<Point> smoothPoints = new List<Point>();
-        System.Timers.Timer lineSmoothingTimer = new System.Timers.Timer();
-        System.Timers.Timer lineProcessingTimer = new System.Timers.Timer();
-        int virtualWidth = GetSystemMetrics(78);
-        int virtualHeight = GetSystemMetrics(79);
-        int virtualLeft = GetSystemMetrics(76);
-        int virtualTop = GetSystemMetrics(77);
+        public Config config;
+        public Settings settings;
+        public Overlay overlay = new Overlay();
+        private List<Point> linePoints = new List<Point>();
+        private List<Point> smoothPoints = new List<Point>();
+        private System.Timers.Timer lineSmoothingTimer = new System.Timers.Timer();
+        private System.Timers.Timer lineProcessingTimer = new System.Timers.Timer();
+        public int virtualWidth = GetSystemMetrics(78);
+        public int virtualHeight = GetSystemMetrics(79);
+        public int virtualLeft = GetSystemMetrics(76);
+        public int virtualTop = GetSystemMetrics(77);
         public bool smoothingOn = false;
         public bool isDrawing = false;
         public bool mouseMoving = false;
         public bool tabletMode = false;
         public Hotkey[] hotKeyHandling = new Hotkey[4];
-        Point position = new Point(0, 0);
-        Point lastPosition = new Point(0, 0);
-
-        // (Most) Settings
-        public Point tabletOffset = new Point(0,0);
-        public Rectangle overrideBounds = new Rectangle(0, 0, 0, 0);
-        public int smoothingStrength = 30;
-        public int smoothingInterpolation = 4;
-        public int overlayScreen = 0;
-        public int tolerance = 300;
-        public bool manualInterpolation = false;
-        public bool stayOnTop = false;
-        public bool disableOverlay = false;
-        public bool allScreens = false;
-        public bool manualOverlayOverride = false;
-        public bool disableCatchUp = false;
-        public bool snapToCursor = false;
-        public bool smoothOnDraw = false;
-        public bool tabletOffsetOverride = false;
-        public bool disableAutoDetection = false;
-        public string[] hotkeys = { "None", "None", "None", "None" };
+        private Point position = new Point(0, 0);
+        private Point lastPosition = new Point(0, 0);
 
         public Main()
         {
             InitializeComponent();
 
+            // Initialize the config file
+            config = new Config(this, overlay);
+
             // Overlay setup
             overlay.Show();
             overlay.TopMost = true;
-            overlay.Bounds = Screen.AllScreens[overlayScreen].Bounds;
+            overlay.Bounds = Screen.AllScreens[0].Bounds;
             button_colorDialog.BackColor = overlay.cursorColor;
 
-            // Attempt to load the config file, if not load/keep default settings
-            AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", "Silky Shark.config");
-            LoadConfig();
-
+            // Attempt to load the config file, if any
+            config.LoadConfig();
+            
             // Low level mouse hook (MouseHook.cs)
             MouseHook.Start();
             MouseHook.MouseDownHooked += new EventHandler(MouseDownHandler);
@@ -74,7 +58,7 @@ namespace Silky_Shark
 
             // Line processing updater
             lineProcessingTimer.Elapsed += new ElapsedEventHandler(LineProcessingUpdate);
-            lineProcessingTimer.Interval = smoothingStrength;
+            lineProcessingTimer.Interval = config.smoothingStrength;
 
             // Register a raw input listener
             int size = Marshal.SizeOf(typeof(RawInputDevice));
@@ -84,227 +68,6 @@ namespace Silky_Shark
             devices[0].Flags = 0x00000100;
             devices[0].Target = Handle;
             RegisterRawInputDevices(devices, 1, size);
-        }
-
-        // (Very ugly) Configuration file handling
-        public void LoadConfig(bool def = false)
-        {
-            if (def)
-            {
-                tabletOffset = new Point(0, 0);
-                overrideBounds = new Rectangle(0, 0, 0, 0);
-                smoothingStrength = 30;
-                smoothingInterpolation = 4;
-                overlayScreen = 0;
-                tolerance = 300;
-                manualInterpolation = false;
-                stayOnTop = false;
-                disableOverlay = false;
-                allScreens = false;
-                manualOverlayOverride = false;
-                disableCatchUp = false;
-                snapToCursor = false;
-                smoothOnDraw = false;
-                tabletOffsetOverride = false;
-                disableAutoDetection = false;
-                hotkeys[0] = "None";
-                hotkeys[1] = "None";
-                hotkeys[2] = "None";
-                hotkeys[3] = "None";
-
-                // Main window resetting
-                checkBox_smoothOnDraw.Checked = false;
-                checkBox_stayOnTop.Checked = false;
-                checkBox_tabletMode.Checked = false;
-                checkBox_tabletMode.Enabled = false;
-                checkBox_manualInterpolation.Checked = false;
-                trackBar_smoothingInterpolation.Enabled = false;
-                textBox_smoothingInterpolation.Enabled = false;
-                textBox_smoothingInterpolation.Text = smoothingInterpolation.ToString();
-                textBox_smoothingStrength.Text = smoothingStrength.ToString();
-                checkBox_smoothOnDraw.Checked = false;
-                TopMost = false;
-
-                // Cursor and overlay resetting
-                overlay.cursorColor = Color.FromArgb(128, 128, 128);
-                overlay.cursorFillColor = Color.FromArgb(255, 255, 254);
-                overlay.cursorType = Overlay.CursorType.Bullseye;
-                overlay.Show();
-                overlay.Bounds = Screen.PrimaryScreen.Bounds;
-                button_colorDialog.BackColor = overlay.cursorColor;
-
-                // Hotkey resetting
-                for (int i = 0; i < hotKeyHandling.Count(); i++)
-                {
-                    try
-                    {
-                        hotKeyHandling[i].Dispose();
-                    }
-                    catch
-                    {
-                        // Nothing to dispose!
-                    }
-                }
-            }
-            else
-            {
-                try
-                {
-                    Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                    // Main window loading
-                    smoothingStrength = int.Parse(config.AppSettings.Settings["Strength"].Value);
-                    smoothingInterpolation = int.Parse(config.AppSettings.Settings["Interpolation"].Value);
-                    manualInterpolation = bool.Parse(config.AppSettings.Settings["Manual Interpolation"].Value);
-                    smoothOnDraw = bool.Parse(config.AppSettings.Settings["Smooth On Draw"].Value);
-                    stayOnTop = bool.Parse(config.AppSettings.Settings["Stay On Top"].Value);
-                    disableAutoDetection = bool.Parse(config.AppSettings.Settings["Disable Auto Detection"].Value);
-                    tabletMode = bool.Parse(config.AppSettings.Settings["Tablet Mode"].Value);
-                    checkBox_tabletMode.Enabled = disableAutoDetection;
-                    checkBox_tabletMode.Checked = tabletMode;
-                    checkBox_smoothOnDraw.Checked = smoothOnDraw;
-                    if (manualInterpolation)
-                    {
-                        checkBox_manualInterpolation.Checked = true;
-                        trackBar_smoothingInterpolation.Enabled = true;
-                        textBox_smoothingInterpolation.Enabled = true;
-                    }
-                    textBox_smoothingInterpolation.Text = smoothingInterpolation.ToString();
-                    textBox_smoothingStrength.Text = smoothingStrength.ToString();
-                    if (stayOnTop)
-                    {
-                        checkBox_stayOnTop.Checked = true;
-                        TopMost = true;
-                        overlay.TopMost = true;
-                    }
-
-                    // Cursor and overlay loading
-                    overlay.cursorType = (Overlay.CursorType)Enum.Parse(typeof(Overlay.CursorType), config.AppSettings.Settings["Cursor Graphic"].Value);
-                    overlay.cursorColor = ColorTranslator.FromHtml(config.AppSettings.Settings["Main Color"].Value);
-                    overlay.cursorFillColor = ColorTranslator.FromHtml(config.AppSettings.Settings["Fill Color"].Value);
-                    overlayScreen = int.Parse(config.AppSettings.Settings["Overlay Screen"].Value);
-                    disableOverlay = bool.Parse(config.AppSettings.Settings["Disable Overlay"].Value);
-                    allScreens = bool.Parse(config.AppSettings.Settings["All Screens"].Value);
-                    manualOverlayOverride = bool.Parse(config.AppSettings.Settings["Manual Overlay Override"].Value);
-                    RectangleConverter r = new RectangleConverter();
-                    overrideBounds = (Rectangle)r.ConvertFromString(config.AppSettings.Settings["Override Bounds"].Value);
-                    if (disableOverlay) overlay.Hide();
-                    overlay.Bounds = Screen.AllScreens[overlayScreen].Bounds;
-                    if (allScreens) overlay.Bounds = new Rectangle(0, 0, SystemInformation.VirtualScreen.Width, SystemInformation.VirtualScreen.Height);
-                    if (manualOverlayOverride) overlay.Bounds = overrideBounds;
-                    button_colorDialog.BackColor = overlay.cursorColor;
-
-                    // ...and everything else
-                    disableCatchUp = bool.Parse(config.AppSettings.Settings["Disable Catch Up"].Value);
-                    snapToCursor = bool.Parse(config.AppSettings.Settings["Snap To Cursor"].Value);
-                    tolerance = int.Parse(config.AppSettings.Settings["Tolerance"].Value);
-                    tabletOffsetOverride = bool.Parse(config.AppSettings.Settings["Tablet Offset Override"].Value);
-                    PointConverter p = new PointConverter();
-                    tabletOffset = (Point)p.ConvertFromString(config.AppSettings.Settings["Tablet Offset"].Value);
-                    KeysConverter c = new KeysConverter();
-                    Keys k;
-                    Hotkey.KeyModifiers m;
-                    hotkeys[0] = config.AppSettings.Settings["Hotkey 1"].Value;
-                    if (hotkeys[0] != "None")
-                    {
-                        k = (Keys)c.ConvertFromString(config.AppSettings.Settings["Hotkey 1"].Value);
-                        m = Hotkey.GetModifiers(k, out k);
-                        if (k != Keys.None)
-                        {
-                            RegisterHotkey(Handle, 0, m, k);
-                        }
-                    }
-                    hotkeys[1] = config.AppSettings.Settings["Hotkey 2"].Value;
-                    if (hotkeys[1] != "None")
-                    {
-                        k = (Keys)c.ConvertFromString(config.AppSettings.Settings["Hotkey 2"].Value);
-                        m = Hotkey.GetModifiers(k, out k);
-                        if (k != Keys.None)
-                        {
-                            RegisterHotkey(Handle, 1, m, k);
-                        }
-                    }
-                    hotkeys[2] = config.AppSettings.Settings["Hotkey 3"].Value;
-                    if (hotkeys[2] != "None")
-                    {
-                        k = (Keys)c.ConvertFromString(config.AppSettings.Settings["Hotkey 3"].Value);
-                        m = Hotkey.GetModifiers(k, out k);
-                        if (k != Keys.None)
-                        {
-                            RegisterHotkey(Handle, 2, m, k);
-                        }
-                    }
-                    hotkeys[3] = config.AppSettings.Settings["Hotkey 4"].Value;
-                    if (hotkeys[3] != "None")
-                    {
-                        k = (Keys)c.ConvertFromString(config.AppSettings.Settings["Hotkey 4"].Value);
-                        m = Hotkey.GetModifiers(k, out k);
-                        if (k != Keys.None)
-                        {
-                            RegisterHotkey(Handle, 3, m, k);
-                        }
-                    }
-                }
-                catch
-                {
-                    // Quietly fail loading bad configs or no configs
-                }
-            }
-        }
-
-        public void SaveConfig()
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings.Remove("Strength");
-            config.AppSettings.Settings.Add("Strength", smoothingStrength.ToString());
-            config.AppSettings.Settings.Remove("Interpolation");
-            config.AppSettings.Settings.Add("Interpolation", smoothingInterpolation.ToString());
-            config.AppSettings.Settings.Remove("Manual Interpolation");
-            config.AppSettings.Settings.Add("Manual Interpolation", manualInterpolation.ToString());
-            config.AppSettings.Settings.Remove("Smooth On Draw");
-            config.AppSettings.Settings.Add("Smooth On Draw", smoothOnDraw.ToString());
-            config.AppSettings.Settings.Remove("Stay On Top");
-            config.AppSettings.Settings.Add("Stay On Top", stayOnTop.ToString());
-            config.AppSettings.Settings.Remove("Tablet Mode");
-            config.AppSettings.Settings.Add("Tablet Mode", tabletMode.ToString());
-            config.AppSettings.Settings.Remove("Overlay Screen");
-            config.AppSettings.Settings.Add("Overlay Screen", overlayScreen.ToString());
-            config.AppSettings.Settings.Remove("Disable Overlay");
-            config.AppSettings.Settings.Add("Disable Overlay", disableOverlay.ToString());
-            config.AppSettings.Settings.Remove("All Screens");
-            config.AppSettings.Settings.Add("All Screens", allScreens.ToString());
-            config.AppSettings.Settings.Remove("Manual Overlay Override");
-            config.AppSettings.Settings.Add("Manual Overlay Override", manualOverlayOverride.ToString());
-            config.AppSettings.Settings.Remove("Override Bounds");
-            RectangleConverter r = new RectangleConverter();
-            config.AppSettings.Settings.Add("Override Bounds", r.ConvertToString(overrideBounds));
-            config.AppSettings.Settings.Remove("Disable Catch Up");
-            config.AppSettings.Settings.Add("Disable Catch Up", disableCatchUp.ToString());
-            config.AppSettings.Settings.Remove("Snap to Cursor");
-            config.AppSettings.Settings.Add("Snap to Cursor", snapToCursor.ToString());
-            config.AppSettings.Settings.Remove("Cursor Graphic");
-            config.AppSettings.Settings.Add("Cursor Graphic", overlay.cursorType.ToString());
-            config.AppSettings.Settings.Remove("Main Color");
-            config.AppSettings.Settings.Add("Main Color", ColorTranslator.ToHtml(overlay.cursorColor));
-            config.AppSettings.Settings.Remove("Fill Color");
-            config.AppSettings.Settings.Add("Fill Color", ColorTranslator.ToHtml(overlay.cursorFillColor));
-            config.AppSettings.Settings.Remove("Disable Auto Detection");
-            config.AppSettings.Settings.Add("Disable Auto Detection", disableAutoDetection.ToString());
-            config.AppSettings.Settings.Remove("Tolerance");
-            config.AppSettings.Settings.Add("Tolerance", tolerance.ToString());
-            config.AppSettings.Settings.Remove("Tablet Offset Override");
-            config.AppSettings.Settings.Add("Tablet Offset Override", tabletOffsetOverride.ToString());
-            config.AppSettings.Settings.Remove("Tablet Offset");
-            PointConverter p = new PointConverter();
-            config.AppSettings.Settings.Add("Tablet Offset", p.ConvertToString(tabletOffset));
-            config.AppSettings.Settings.Remove("Hotkey 1");
-            config.AppSettings.Settings.Add("Hotkey 1", hotkeys[0].ToString());
-            config.AppSettings.Settings.Remove("Hotkey 2");
-            config.AppSettings.Settings.Add("Hotkey 2", hotkeys[1].ToString());
-            config.AppSettings.Settings.Remove("Hotkey 3");
-            config.AppSettings.Settings.Add("Hotkey 3", hotkeys[2].ToString());
-            config.AppSettings.Settings.Remove("Hotkey 4");
-            config.AppSettings.Settings.Add("Hotkey 4", hotkeys[3].ToString());
-            config.Save(ConfigurationSaveMode.Modified);
         }
 
         // Hotkey handling
@@ -348,7 +111,7 @@ namespace Silky_Shark
         {
             if (Application.OpenForms.OfType<Settings>().Count() != 1)
             {
-                if (disableAutoDetection)
+                if (config.disableAutoDetection)
                 {
                     checkBox_tabletMode.Checked = !checkBox_tabletMode.Checked;
                     tabletMode = checkBox_tabletMode.Checked;
@@ -368,15 +131,15 @@ namespace Silky_Shark
         {
             if (Application.OpenForms.OfType<Settings>().Count() != 1)
             {
-                if (!disableOverlay)
+                if (!config.disableOverlay)
                 {
                     overlay.Hide();
-                    disableOverlay = true;
+                    config.disableOverlay = true;
                 }
                 else
                 {
                     overlay.Show();
-                    disableOverlay = false;
+                    config.disableOverlay = false;
                 }
             }
         }
@@ -399,9 +162,9 @@ namespace Silky_Shark
             GetRawInputData(m.LParam, RidInput, out input, ref size, headerSize);
             RawMouse mouse = input.Mouse;
 
-            if (!disableAutoDetection)
+            if (!config.disableAutoDetection)
             {
-                if (mouse.LastX > tolerance || mouse.LastY > tolerance)
+                if (mouse.LastX > config.tolerance || mouse.LastY > config.tolerance)
                 {
                     checkBox_tabletMode.Checked = true;
                     tabletMode = true;
@@ -418,7 +181,7 @@ namespace Silky_Shark
                 if (tabletMode)
                 {
                     Point offset = new Point(0, 0);
-                    if (tabletOffsetOverride) offset = tabletOffset;
+                    if (config.tabletOffsetOverride) offset = config.tabletOffset;
                     int tabletX = mouse.LastX * virtualWidth / 65536;
                     int tabletY = mouse.LastY * virtualHeight / 65536;
                     Point p = new Point(tabletX + offset.X + virtualLeft, tabletY + offset.Y + virtualTop);
@@ -469,9 +232,9 @@ namespace Silky_Shark
 
                     smoothPoints.Add(new Point((int)a[3], (int)b[3]));
 
-                    for (i = 1; i <= smoothingInterpolation - 1; i++)
+                    for (i = 1; i <= config.smoothingInterpolation - 1; i++)
                     {
-                        float t = Convert.ToSingle(i) / Convert.ToSingle(smoothingInterpolation);
+                        float t = Convert.ToSingle(i) / Convert.ToSingle(config.smoothingInterpolation);
                         splineX = (int)((a[2] + t * (a[1] + t * a[0])) * t + a[3]);
                         splineY = (int)((b[2] + t * (b[1] + t * b[0])) * t + b[3]);
                         if (smoothPoints.Last<Point>() != new Point(splineX, splineY))
@@ -483,7 +246,7 @@ namespace Silky_Shark
                 }
                 else if (MouseHook.GetCursorPosition() != position && isDrawing)
                 {
-                    if (disableCatchUp)
+                    if (config.disableCatchUp)
                     {
                         if (mouseMoving)
                         {
@@ -521,7 +284,7 @@ namespace Silky_Shark
                 // Begin smoothing only if we have points to work with and if drawing
                 if (smoothPoints.Count > 0 && isDrawing)
                 {
-                    if (disableCatchUp)
+                    if (config.disableCatchUp)
                     {
                         if (mouseMoving)
                         {
@@ -545,7 +308,7 @@ namespace Silky_Shark
             {
                 smoothPoints.Clear();
                 lineSmoothingTimer.Stop();
-                if (!snapToCursor) MouseHook.SetCursorPos(guidePos.X, guidePos.Y);
+                if (!config.snapToCursor) MouseHook.SetCursorPos(guidePos.X, guidePos.Y);
                 MouseHook.moveEnabled = true;
                 MouseHook.downEnabled = true;
             }
@@ -556,7 +319,7 @@ namespace Silky_Shark
         {
             if (smoothingOn)
             {
-                if (smoothOnDraw && !isDrawing)
+                if (config.smoothOnDraw && !isDrawing)
                 {
                     linePoints.Clear();
                     smoothPoints.Clear();
@@ -578,13 +341,13 @@ namespace Silky_Shark
         {
             if (smoothingOn)
             {
-                if (smoothOnDraw && isDrawing)
+                if (config.smoothOnDraw && isDrawing)
                 {
                     MouseHook.downEnabled = false;
                     isDrawing = false;
                     lineProcessingTimer.Stop();
                     linePoints.Clear();
-                    if (!snapToCursor)
+                    if (!config.snapToCursor)
                     {
                         Point guidePos = overlay.cursorPos;
                         MouseHook.SetCursorPos(guidePos.X, guidePos.Y);
@@ -604,7 +367,7 @@ namespace Silky_Shark
                 overlay.Invalidate();
             }
 
-            if (smoothOnDraw && !isDrawing && MouseHook.moveEnabled)
+            if (config.smoothOnDraw && !isDrawing && MouseHook.moveEnabled)
             {
                 overlay.cursorPos = MouseHook.GetCursorPosition();
                 overlay.Invalidate();
@@ -658,7 +421,7 @@ namespace Silky_Shark
                 {
                     // Fail gracefully
                 }
-                if (disableAutoDetection)
+                if (config.disableAutoDetection)
                 {
                     checkBox_tabletMode.Enabled = true;
                 }
@@ -671,7 +434,7 @@ namespace Silky_Shark
                 smoothPoints.Clear();
                 position = MouseHook.GetCursorPosition();
                 smoothPoints.Add(position);
-                if (smoothOnDraw)
+                if (config.smoothOnDraw)
                 {
                     MouseHook.moveEnabled = true;
                     isDrawing = false;
@@ -692,7 +455,7 @@ namespace Silky_Shark
                 {
                     // Fail gracefully
                 }
-                if (disableAutoDetection)
+                if (config.disableAutoDetection)
                 {
                     checkBox_tabletMode.Enabled = false;
                 }
@@ -701,14 +464,14 @@ namespace Silky_Shark
 
         private void trackBar_smoothStrength_Scroll(object sender, EventArgs e)
         {
-            smoothingStrength = trackBar_smoothingStrength.Value;
-            lineProcessingTimer.Interval = smoothingStrength;
-            textBox_smoothingStrength.Text = smoothingStrength.ToString();
-            if (!manualInterpolation)
+            config.smoothingStrength = trackBar_smoothingStrength.Value;
+            lineProcessingTimer.Interval = config.smoothingStrength;
+            textBox_smoothingStrength.Text = config.smoothingStrength.ToString();
+            if (!config.manualInterpolation)
             {
-                smoothingInterpolation = (int)Math.Round(smoothingStrength * 0.15);
-                trackBar_smoothingInterpolation.Value = smoothingInterpolation;
-                textBox_smoothingInterpolation.Text = smoothingInterpolation.ToString();
+                config.smoothingInterpolation = (int)Math.Round(config.smoothingStrength * 0.15);
+                trackBar_smoothingInterpolation.Value = config.smoothingInterpolation;
+                textBox_smoothingInterpolation.Text = config.smoothingInterpolation.ToString();
             }
         }
 
@@ -718,37 +481,37 @@ namespace Silky_Shark
             {
                 if (int.Parse(textBox_smoothingStrength.Text) < 1)
                 {
-                    smoothingStrength = 1;
+                    config.smoothingStrength = 1;
                 }
                 else if (int.Parse(textBox_smoothingStrength.Text) > 100)
                 {
-                    smoothingStrength = 100;
+                    config.smoothingStrength = 100;
                 }
                 else
                 {
-                    smoothingStrength = int.Parse(textBox_smoothingStrength.Text);
+                    config.smoothingStrength = int.Parse(textBox_smoothingStrength.Text);
                 }
             }
             catch
             {
-                smoothingStrength = 1;
+                config.smoothingStrength = 1;
             }
-            lineProcessingTimer.Interval = smoothingStrength;
-            trackBar_smoothingStrength.Value = smoothingStrength;
-            textBox_smoothingStrength.Text = smoothingStrength.ToString();
-            if (!manualInterpolation)
+            lineProcessingTimer.Interval = config.smoothingStrength;
+            trackBar_smoothingStrength.Value = config.smoothingStrength;
+            textBox_smoothingStrength.Text = config.smoothingStrength.ToString();
+            if (!config.manualInterpolation)
             {
-                smoothingInterpolation = (int)Math.Round(smoothingStrength * 0.15);
-                trackBar_smoothingInterpolation.Value = smoothingInterpolation;
-                textBox_smoothingInterpolation.Text = smoothingInterpolation.ToString();
+                config.smoothingInterpolation = (int)Math.Round(config.smoothingStrength * 0.15);
+                trackBar_smoothingInterpolation.Value = config.smoothingInterpolation;
+                textBox_smoothingInterpolation.Text = config.smoothingInterpolation.ToString();
             }
         }
 
         private void trackBar_smoothingInterpolation_Scroll(object sender, EventArgs e)
         {
-            smoothingInterpolation = trackBar_smoothingInterpolation.Value;
-            trackBar_smoothingInterpolation.Value = smoothingInterpolation;
-            textBox_smoothingInterpolation.Text = smoothingInterpolation.ToString();
+            config.smoothingInterpolation = trackBar_smoothingInterpolation.Value;
+            trackBar_smoothingInterpolation.Value = config.smoothingInterpolation;
+            textBox_smoothingInterpolation.Text = config.smoothingInterpolation.ToString();
         }
 
         private void textBox_smoothingInterpolation_TextChanged(object sender, EventArgs e)
@@ -757,41 +520,41 @@ namespace Silky_Shark
             {
                 if (int.Parse(textBox_smoothingInterpolation.Text) < 0)
                 {
-                    smoothingInterpolation = 0;
+                    config.smoothingInterpolation = 0;
                 }
                 else if (int.Parse(textBox_smoothingInterpolation.Text) > 20)
                 {
-                    smoothingInterpolation = 20;
+                    config.smoothingInterpolation = 20;
                 }
                 else
                 {
-                    smoothingInterpolation = int.Parse(textBox_smoothingInterpolation.Text);
+                    config.smoothingInterpolation = int.Parse(textBox_smoothingInterpolation.Text);
                 }
             }
             catch
             {
-                smoothingInterpolation = 0;
+                config.smoothingInterpolation = 0;
             }
-            trackBar_smoothingInterpolation.Value = smoothingInterpolation;
-            textBox_smoothingInterpolation.Text = smoothingInterpolation.ToString();
+            trackBar_smoothingInterpolation.Value = config.smoothingInterpolation;
+            textBox_smoothingInterpolation.Text = config.smoothingInterpolation.ToString();
         }
 
         private void checkBox_manualInterpolation_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox_manualInterpolation.Checked)
             {
-                manualInterpolation = true;
+                config.manualInterpolation = true;
                 trackBar_smoothingInterpolation.Enabled = true;
                 textBox_smoothingInterpolation.Enabled = true;
             }
             else
             {
-                manualInterpolation = false;
+                config.manualInterpolation = false;
                 trackBar_smoothingInterpolation.Enabled = false;
                 textBox_smoothingInterpolation.Enabled = false;
-                smoothingInterpolation = (int)Math.Round(smoothingStrength * 0.15);
-                trackBar_smoothingInterpolation.Value = smoothingInterpolation;
-                textBox_smoothingInterpolation.Text = smoothingInterpolation.ToString();
+                config.smoothingInterpolation = (int)Math.Round(config.smoothingStrength * 0.15);
+                trackBar_smoothingInterpolation.Value = config.smoothingInterpolation;
+                textBox_smoothingInterpolation.Text = config.smoothingInterpolation.ToString();
             }
         }
 
@@ -801,12 +564,12 @@ namespace Silky_Shark
             {
                 TopMost = true;
                 overlay.TopMost = true;
-                stayOnTop = true;
+                config.stayOnTop = true;
             }
             else
             {
                 TopMost = false;
-                stayOnTop = false;
+                config.stayOnTop = false;
             }
         }
 
@@ -823,7 +586,7 @@ namespace Silky_Shark
                     lineProcessingTimer.Stop();
                     lineSmoothingTimer.Stop();
                 }
-                smoothOnDraw = true;
+                config.smoothOnDraw = true;
             }
             else
             {
@@ -835,7 +598,7 @@ namespace Silky_Shark
                     lineProcessingTimer.Start();
                     lineSmoothingTimer.Start();
                 }
-                smoothOnDraw = false;
+                config.smoothOnDraw = false;
             }
         }
 
@@ -846,12 +609,12 @@ namespace Silky_Shark
         
         private void button_toggleScreen_Click(object sender, EventArgs e)
         {
-            overlayScreen++;
-            if (overlayScreen > (Screen.AllScreens.Count() - 1))
+            config.overlayScreen++;
+            if (config.overlayScreen > (Screen.AllScreens.Count() - 1))
             {
-                overlayScreen = 0;
+                config.overlayScreen = 0;
             }
-            overlay.Bounds = Screen.AllScreens[overlayScreen].Bounds;
+            overlay.Bounds = Screen.AllScreens[config.overlayScreen].Bounds;
             overlay.Invalidate();
         }
 
@@ -881,7 +644,7 @@ namespace Silky_Shark
         {
             if (Application.OpenForms.OfType<Settings>().Count() != 1)
             {
-                settings = new Settings(this, overlay);
+                settings = new Settings(this, config, overlay);
                 settings.Owner = this;
                 settings.MinimizeBox = false;
                 settings.MaximizeBox = false;
@@ -893,13 +656,13 @@ namespace Silky_Shark
 
         private void ToolStripMenuItem_saveConfig_Click(object sender, EventArgs e)
         {
-            SaveConfig();
+            config.SaveConfig();
             MessageBox.Show("Configuration settings saved to: Silky Shark.config", "Silky Shark", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void ToolStripMenuItem_restoreDefaults_Click(object sender, EventArgs e)
         {
-            LoadConfig(true);
+            config.LoadConfig(true);
             MessageBox.Show("Default settings restored.", "Silky Shark", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
