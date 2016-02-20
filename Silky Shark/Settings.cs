@@ -141,6 +141,30 @@ namespace Silky_Shark
                 }
                 textBox_hotkeyTabletMode.Text = mod + k;
             }
+            k = (Keys)c.ConvertFromString(config.hotkeys[4]);
+            if (k.ToString() != "None")
+            {
+                m = Hotkey.GetModifiers(k, out k);
+                mod = "";
+                ms = m.ToString().Split(new[] { ", " }, StringSplitOptions.None);
+                foreach (string mm in ms)
+                {
+                    mod += mm + "+";
+                }
+                textBox_hotkeyStrengthUp.Text = mod + k;
+            }
+            k = (Keys)c.ConvertFromString(config.hotkeys[5]);
+            if (k.ToString() != "None")
+            {
+                m = Hotkey.GetModifiers(k, out k);
+                mod = "";
+                ms = m.ToString().Split(new[] { ", " }, StringSplitOptions.None);
+                foreach (string mm in ms)
+                {
+                    mod += mm + "+";
+                }
+                textBox_hotkeyStrengthDown.Text = mod + k;
+            }
         }
 
         // Draw some cursor examples
@@ -517,6 +541,26 @@ namespace Silky_Shark
             SettingsUnregisterHotkey(3);
         }
 
+        private void textBox_hotkeyStrengthUp_KeyDown(object sender, KeyEventArgs e)
+        {
+            SettingsRegisterHotkey(e, 4);
+        }
+
+        private void button_hotkeyStrengthUp_Click(object sender, EventArgs e)
+        {
+            SettingsUnregisterHotkey(4);
+        }
+
+        private void textBox_hotkeyStrengthDown_KeyDown(object sender, KeyEventArgs e)
+        {
+            SettingsRegisterHotkey(e, 5);
+        }
+
+        private void button_hotkeyStrengthDown_Click(object sender, EventArgs e)
+        {
+            SettingsUnregisterHotkey(5);
+        }
+
         private void SettingsRegisterHotkey(KeyEventArgs e, int id)
         {
             e.SuppressKeyPress = true;
@@ -549,6 +593,12 @@ namespace Silky_Shark
                             case 3:
                                 textBox_hotkeyTabletMode.Text = mod + key;
                                 break;
+                            case 4:
+                                textBox_hotkeyStrengthUp.Text = mod + key;
+                                break;
+                            case 5:
+                                textBox_hotkeyStrengthDown.Text = mod + key;
+                                break;
                         }
                         config.hotkeys[id] = hotkey;
                         mainForm.RegisterHotkey(mainForm.Handle, id, modifiers, key);
@@ -576,6 +626,12 @@ namespace Silky_Shark
                         break;
                     case 3:
                         textBox_hotkeyTabletMode.Text = "";
+                        break;
+                    case 4:
+                        textBox_hotkeyStrengthUp.Text = "";
+                        break;
+                    case 5:
+                        textBox_hotkeyStrengthDown.Text = "";
                         break;
                 }
             }

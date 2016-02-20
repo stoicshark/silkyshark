@@ -29,7 +29,7 @@ namespace Silky_Shark
         public bool smoothOnDraw = false;
         public bool tabletOffsetOverride = false;
         public bool disableAutoDetection = false;
-        public string[] hotkeys = { "None", "None", "None", "None" };
+        public string[] hotkeys = { "None", "None", "None", "None", "None", "None" };
 
         public Config(Main m, Overlay o)
         {
@@ -62,6 +62,8 @@ namespace Silky_Shark
                 hotkeys[1] = "None";
                 hotkeys[2] = "None";
                 hotkeys[3] = "None";
+                hotkeys[4] = "None";
+                hotkeys[5] = "None";
 
                 // Main window resetting
                 mainForm.checkBox_smoothOnDraw.Checked = false;
@@ -194,6 +196,26 @@ namespace Silky_Shark
                             mainForm.RegisterHotkey(mainForm.Handle, 3, m, k);
                         }
                     }
+                    hotkeys[4] = config.AppSettings.Settings["Hotkey 5"].Value;
+                    if (hotkeys[4] != "None")
+                    {
+                        k = (Keys)c.ConvertFromString(config.AppSettings.Settings["Hotkey 5"].Value);
+                        m = Hotkey.GetModifiers(k, out k);
+                        if (k != Keys.None)
+                        {
+                            mainForm.RegisterHotkey(mainForm.Handle, 4, m, k);
+                        }
+                    }
+                    hotkeys[5] = config.AppSettings.Settings["Hotkey 6"].Value;
+                    if (hotkeys[5] != "None")
+                    {
+                        k = (Keys)c.ConvertFromString(config.AppSettings.Settings["Hotkey 6"].Value);
+                        m = Hotkey.GetModifiers(k, out k);
+                        if (k != Keys.None)
+                        {
+                            mainForm.RegisterHotkey(mainForm.Handle, 5, m, k);
+                        }
+                    }
                 }
                 catch
                 {
@@ -255,6 +277,10 @@ namespace Silky_Shark
             config.AppSettings.Settings.Add("Hotkey 3", hotkeys[2].ToString());
             config.AppSettings.Settings.Remove("Hotkey 4");
             config.AppSettings.Settings.Add("Hotkey 4", hotkeys[3].ToString());
+            config.AppSettings.Settings.Remove("Hotkey 5");
+            config.AppSettings.Settings.Add("Hotkey 5", hotkeys[4].ToString());
+            config.AppSettings.Settings.Remove("Hotkey 6");
+            config.AppSettings.Settings.Add("Hotkey 6", hotkeys[5].ToString());
             config.Save(ConfigurationSaveMode.Modified);
         }
     }

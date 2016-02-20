@@ -69,10 +69,16 @@
             this.textBox_tabletOffsetY = new System.Windows.Forms.TextBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.label17 = new System.Windows.Forms.Label();
+            this.button_hotkeyStrengthDown = new System.Windows.Forms.Button();
+            this.button_hotkeyStrengthUp = new System.Windows.Forms.Button();
             this.button_hotkeyTabletMode = new System.Windows.Forms.Button();
             this.button_hotkeyToggleDisplay = new System.Windows.Forms.Button();
+            this.textBox_hotkeyStrengthDown = new System.Windows.Forms.TextBox();
+            this.textBox_hotkeyStrengthUp = new System.Windows.Forms.TextBox();
             this.textBox_hotkeyTabletMode = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
             this.button_hotkeyOverlayOnOff = new System.Windows.Forms.Button();
+            this.label18 = new System.Windows.Forms.Label();
             this.textBox_hotkeyToggleDisplay = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.button_hotkeyOnOff = new System.Windows.Forms.Button();
@@ -502,10 +508,16 @@
             // tabPage4
             // 
             this.tabPage4.Controls.Add(this.label17);
+            this.tabPage4.Controls.Add(this.button_hotkeyStrengthDown);
+            this.tabPage4.Controls.Add(this.button_hotkeyStrengthUp);
             this.tabPage4.Controls.Add(this.button_hotkeyTabletMode);
             this.tabPage4.Controls.Add(this.button_hotkeyToggleDisplay);
+            this.tabPage4.Controls.Add(this.textBox_hotkeyStrengthDown);
+            this.tabPage4.Controls.Add(this.textBox_hotkeyStrengthUp);
             this.tabPage4.Controls.Add(this.textBox_hotkeyTabletMode);
+            this.tabPage4.Controls.Add(this.label19);
             this.tabPage4.Controls.Add(this.button_hotkeyOverlayOnOff);
+            this.tabPage4.Controls.Add(this.label18);
             this.tabPage4.Controls.Add(this.textBox_hotkeyToggleDisplay);
             this.tabPage4.Controls.Add(this.label16);
             this.tabPage4.Controls.Add(this.button_hotkeyOnOff);
@@ -523,12 +535,32 @@
             // 
             // label17
             // 
-            this.label17.Location = new System.Drawing.Point(3, 142);
+            this.label17.Location = new System.Drawing.Point(3, 157);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(211, 82);
+            this.label17.Size = new System.Drawing.Size(211, 67);
             this.label17.TabIndex = 3;
             this.label17.Text = "Warning, these are global hotkeys and may\r\noverride other application defined hot" +
-    "keys.\r\n\r\n\r\nHotkeys are disabled while the Settings\r\nwindow is open.";
+    "keys.\r\n\r\nHotkeys are disabled while the Settings\r\nwindow is open.";
+            // 
+            // button_hotkeyStrengthDown
+            // 
+            this.button_hotkeyStrengthDown.Location = new System.Drawing.Point(194, 133);
+            this.button_hotkeyStrengthDown.Name = "button_hotkeyStrengthDown";
+            this.button_hotkeyStrengthDown.Size = new System.Drawing.Size(20, 20);
+            this.button_hotkeyStrengthDown.TabIndex = 2;
+            this.button_hotkeyStrengthDown.Text = "X";
+            this.button_hotkeyStrengthDown.UseVisualStyleBackColor = true;
+            this.button_hotkeyStrengthDown.Click += new System.EventHandler(this.button_hotkeyStrengthDown_Click);
+            // 
+            // button_hotkeyStrengthUp
+            // 
+            this.button_hotkeyStrengthUp.Location = new System.Drawing.Point(194, 107);
+            this.button_hotkeyStrengthUp.Name = "button_hotkeyStrengthUp";
+            this.button_hotkeyStrengthUp.Size = new System.Drawing.Size(20, 20);
+            this.button_hotkeyStrengthUp.TabIndex = 2;
+            this.button_hotkeyStrengthUp.Text = "X";
+            this.button_hotkeyStrengthUp.UseVisualStyleBackColor = true;
+            this.button_hotkeyStrengthUp.Click += new System.EventHandler(this.button_hotkeyStrengthUp_Click);
             // 
             // button_hotkeyTabletMode
             // 
@@ -550,6 +582,22 @@
             this.button_hotkeyToggleDisplay.UseVisualStyleBackColor = true;
             this.button_hotkeyToggleDisplay.Click += new System.EventHandler(this.button_hotkeyToggleDisplay_Click);
             // 
+            // textBox_hotkeyStrengthDown
+            // 
+            this.textBox_hotkeyStrengthDown.Location = new System.Drawing.Point(88, 133);
+            this.textBox_hotkeyStrengthDown.Name = "textBox_hotkeyStrengthDown";
+            this.textBox_hotkeyStrengthDown.Size = new System.Drawing.Size(100, 20);
+            this.textBox_hotkeyStrengthDown.TabIndex = 1;
+            this.textBox_hotkeyStrengthDown.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_hotkeyStrengthDown_KeyDown);
+            // 
+            // textBox_hotkeyStrengthUp
+            // 
+            this.textBox_hotkeyStrengthUp.Location = new System.Drawing.Point(88, 107);
+            this.textBox_hotkeyStrengthUp.Name = "textBox_hotkeyStrengthUp";
+            this.textBox_hotkeyStrengthUp.Size = new System.Drawing.Size(100, 20);
+            this.textBox_hotkeyStrengthUp.TabIndex = 1;
+            this.textBox_hotkeyStrengthUp.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_hotkeyStrengthUp_KeyDown);
+            // 
             // textBox_hotkeyTabletMode
             // 
             this.textBox_hotkeyTabletMode.Location = new System.Drawing.Point(88, 81);
@@ -557,6 +605,15 @@
             this.textBox_hotkeyTabletMode.Size = new System.Drawing.Size(100, 20);
             this.textBox_hotkeyTabletMode.TabIndex = 1;
             this.textBox_hotkeyTabletMode.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_hotkeyTabletMode_KeyDown);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(3, 136);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(78, 13);
+            this.label19.TabIndex = 0;
+            this.label19.Text = "Strength Down";
             // 
             // button_hotkeyOverlayOnOff
             // 
@@ -567,6 +624,15 @@
             this.button_hotkeyOverlayOnOff.Text = "X";
             this.button_hotkeyOverlayOnOff.UseVisualStyleBackColor = true;
             this.button_hotkeyOverlayOnOff.Click += new System.EventHandler(this.button_hotkeyOverlayOnOff_Click);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(3, 110);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(64, 13);
+            this.label18.TabIndex = 0;
+            this.label18.Text = "Strength Up";
             // 
             // textBox_hotkeyToggleDisplay
             // 
@@ -721,5 +787,11 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Button button_hotkeyStrengthDown;
+        private System.Windows.Forms.Button button_hotkeyStrengthUp;
+        private System.Windows.Forms.TextBox textBox_hotkeyStrengthDown;
+        private System.Windows.Forms.TextBox textBox_hotkeyStrengthUp;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label18;
     }
 }

@@ -26,7 +26,7 @@ namespace Silky_Shark
         public bool isDrawing = false;
         public bool mouseMoving = false;
         public bool tabletMode = false;
-        public Hotkey[] hotKeyHandling = new Hotkey[4];
+        public Hotkey[] hotKeyHandling = new Hotkey[6];
         private Point position = new Point(0, 0);
         private Point lastPosition = new Point(0, 0);
 
@@ -99,11 +99,37 @@ namespace Silky_Shark
                     case 3:
                         hotKeyHandling[3].HotKeyPressed += new EventHandler(Hotkey_TabletMode);
                         break;
+                    case 4:
+                        hotKeyHandling[4].HotKeyPressed += new EventHandler(Hotkey_StrengthUp);
+                        break;
+                    case 5:
+                        hotKeyHandling[5].HotKeyPressed += new EventHandler(Hotkey_StrengthDown);
+                        break;
                 }
             }
             catch
             {
                 // Hotkey registration failed
+            }
+        }
+
+        private void Hotkey_StrengthDown(object sender, EventArgs e)
+        {
+            if (Application.OpenForms.OfType<Settings>().Count() != 1)
+            {
+                int s = int.Parse(textBox_smoothingStrength.Text) - 10;
+                s = ((int)Math.Round(s / 10.0)) * 10;
+                textBox_smoothingStrength.Text = s.ToString();
+            }
+        }
+
+        private void Hotkey_StrengthUp(object sender, EventArgs e)
+        {
+            if (Application.OpenForms.OfType<Settings>().Count() != 1)
+            {
+                int s = int.Parse(textBox_smoothingStrength.Text) + 10;
+                s = ((int)Math.Round(s / 10.0)) * 10;
+                textBox_smoothingStrength.Text = s.ToString();
             }
         }
 
